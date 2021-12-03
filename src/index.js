@@ -1,12 +1,13 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
-import App from './App';
+import './Rover.css';
+import RoverComponent from './RoverComponent';
 import reportWebVitals from './reportWebVitals';
 
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+    <RoverComponent />
   </React.StrictMode>,
   document.getElementById('root')
 );
