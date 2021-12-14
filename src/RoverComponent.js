@@ -145,7 +145,7 @@ function Display(props) {
                 {/* <img width="150" height="150"
                     src="https://cdn.discordapp.com/attachments/429121521529651210/912163559310512168/397206-middle.png" alt="" /> */}
                 {/* <div className="userdata"> */}
-                    <h1 className="text">Mars Rover Images</h1>
+                    <h1>Mars Rover Images</h1>
                 {/* </div> */}
                 {/* <img width="150" height="150"
                     src="https://cdn.discordapp.com/attachments/429121521529651210/912163559310512168/397206-middle.png" alt="" /> */}
