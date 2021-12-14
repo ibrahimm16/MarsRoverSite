@@ -72,7 +72,7 @@ class RoverComponent extends React.Component {
     submitRequest() {
         // Data required to fetch a json from the nasa api
         const api = 'https://api.nasa.gov/mars-photos/api/v1/rovers/';
-        const key = '&api_key=W0JTYr31WWFst27Jqc2mkPzSJhCIBaKtWBy3dfcS';
+        const key = '';
         const query = `${api}${this.state.selectedRover}/photos${this.state.selectedDate}${key}`;
 
         // Use the query to return a json result from the api
