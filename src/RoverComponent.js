@@ -4,57 +4,52 @@ class RoverComponent extends React.Component {
     constructor(props) {
         super(props);
 
-        this.getDate = this.getDate.bind(this);
+        const today = new Date(new Date().getTime() - new Date().getTimezoneOffset() * 60000).toISOString().split("T")[0];
+
+        this.state = {
+            selectedRover: "curiosity",
+            selectedDate: "",
+            today: today,
+            minDate: "2012-08-06",
+            maxDate: today,
+            apiData: [],
+            imgSrc: "https://cdn.iconscout.com/icon/free/png-256/data-not-found-1965034-1662569.png",
+            index: 0,
+            maxIndex: 0,
+            displayDate: "No date selected"
+        }
+
         this.changeRover = this.changeRover.bind(this);
-        this.generateQuery = this.generateQuery.bind(this);
+        this.changeDate = this.changeDate.bind(this);
         this.submitRequest = this.submitRequest.bind(this);
         this.changeIndex = this.changeIndex.bind(this);
         this.next = this.next.bind(this);
         this.previous = this.previous.bind(this);
-
-        const today = new Date(new Date().getTime() - new Date().getTimezoneOffset() * 60000).toISOString().split("T")[0];
-
-        this.state = {
-            api1: "https://api.nasa.gov/mars-photos/api/v1/rovers/",
-            api2: "/photos",
-            selectedRover: "curiosity",
-            key: "&api_key=W0JTYr31WWFst27Jqc2mkPzSJhCIBaKtWBy3dfcS",
-            apiQuery: "",
-            submittedQuery: "",
-            apiData: [],
-            months: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
-            imgSrc: "https://cdn.iconscout.com/icon/free/png-256/data-not-found-1965034-1662569.png",
-            date: "No date selected",
-            index: 0,
-            maxIndex: 0,
-            today: today,
-            minDate: "2012-08-06",
-            maxDate: today
-        }
-    }
-
-    getDate() {
-        return new Date(new Date().getTime() - new Date().getTimezoneOffset() * 60000).toISOString().split("T")[0];
     }
 
     changeRover(e) {
-        let today = this.getDate();
-        let minMax = new Map([
-            ["curiosity", ["2012-08-06", today]],
+        // Hash of operational days for each rover
+        const minMax = new Map([
+            ["curiosity", ["2012-08-06", this.state.today]],
             ["opportunity", ["2004-01-26", "2018-06-09"]],
-            ["perseverance", [1, 2]],
-            ["spirit", [1, 2]]
+            ["perseverance", ["2021-02-27", this.state.today]],
+            ["spirit", ["2004-01-05", "2010-03-21"]]
         ]);
 
+        const roverChoice = e.target.value;
+
+        // Update the state with the newly selected rover and its operational days
         this.setState({
-            selectedRover: e.target.value
-            
+            selectedRover: roverChoice,
+            minDate: minMax.get(roverChoice)[0],
+            maxDate: minMax.get(roverChoice)[1]
         })
     }
 
-    generateQuery(e) {
-        // Use the date input field to generate a nasa query and formatted date to display to the user
+    changeDate(e) {
         let date = e.target.value;
+
+        // Format the day, month, and year from the calendar to form an api query and display date
         let day = date.substring(8, 10);
         if (day.substring(0, 1) === 0) {
             day = day.substring(1, 2);
@@ -64,45 +59,48 @@ class RoverComponent extends React.Component {
             month = month.substring(1, 2);
         }
         let year = date.substring(0, 4);
-        let query = `${this.state.api1}${this.state.selectedRover}${this.state.api2}?earth_date=${year}-${month}-${day}${this.state.key}`;
 
-        // Update the state with the new nasa query and formatted date
+        const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+        // Update the state based upon the new date
         this.setState({
-            apiQuery: query,
-            date: `Selected date: ${this.state.months[month - 1]} ${day}, ${year}`
+            selectedDate: `?earth_date=${year}-${month}-${day}`,
+            displayDate: `${months[parseInt(month) - 1]} ${day}, ${year}`
         })
     }
 
     submitRequest() {
-        // fetch the data from the nasa api using the generated apiQuery held in the state
-        if (this.state.apiQuery !== this.state.submittedQuery) {
-            fetch(this.state.apiQuery)
-                .then(response => {
-                    return response.json();
-                })
-                .then(data => {
-                    if (data.photos.length !== 0) {
-                        this.setState({
-                            apiData: data,
-                            index: 0,
-                            maxIndex: data.photos.length - 1,
-                            submittedQuery: this.state.apiQuery,
-                            imgSrc: data.photos[0].img_src
-                        })
-                    } else {
-                        alert("No available photos for this date");
-                        this.setState({
-                            apiData: [],
-                            index: 0,
-                            maxIndex: 0,
-                            submittedQuery: this.state.apiQuery,
-                            imgSrc: "https://cdn.iconscout.com/icon/free/png-256/data-not-found-1965034-1662569.png",
-                        })
-                    }
-                })
-        }
+        // Data required to fetch a json from the nasa api
+        const api = 'https://api.nasa.gov/mars-photos/api/v1/rovers/';
+        const key = '&api_key=W0JTYr31WWFst27Jqc2mkPzSJhCIBaKtWBy3dfcS';
+        const query = `${api}${this.state.selectedRover}/photos${this.state.selectedDate}${key}`;
+
+        // Use the query to return a json result from the api
+        fetch(query)
+            .then(response => {
+                return response.json();
+            })
+            .then(data => {
+                // Check if the query returned valid data and update the page accordingly
+                if (data.photos.length !== 0) {
+                    this.setState({
+                        apiData: data,
+                        index: 0,
+                        maxIndex: data.photos.length - 1,
+                        imgSrc: data.photos[0].img_src
+                    })
+                } else {
+                    this.setState({
+                        apiData: [],
+                        index: 0,
+                        maxIndex: 0,
+                        imgSrc: "https://cdn.iconscout.com/icon/free/png-256/data-not-found-1965034-1662569.png",
+                    })
+                }
+            })
     }
 
+    // Check input from the scroll wheel by the user
     changeIndex(e) {
         if (e.deltaY > 0) {
             this.next();
@@ -111,6 +109,7 @@ class RoverComponent extends React.Component {
         }
     }
 
+    // Moves to the next image if there is one
     next() {
         let newIndex = this.state.index + 1;
         if (this.state.index !== this.state.maxIndex) {
@@ -121,6 +120,7 @@ class RoverComponent extends React.Component {
         }
     }
 
+    // Moves to the previous image if there is one
     previous() {
         let newIndex = this.state.index - 1;
         if (this.state.index !== 0) {
@@ -131,28 +131,36 @@ class RoverComponent extends React.Component {
         }
     }
 
+    // Render function returns the Display function passing necessary data to it via props
     render() {
         return (
-            <Display date={this.state.date} rover={this.state.selectedRover} minDate={this.state.minDate} maxDate={this.state.maxDate} changeRover={this.changeRover} generateQuery={this.generateQuery} submitRequest={this.submitRequest} index={this.state.index + 1} maxIndex={this.state.maxIndex + 1} imgSrc={this.state.imgSrc} changeIndex={this.changeIndex} />
+            <Display
+                rover={this.state.selectedRover}
+                changeRover={this.changeRover}
+                date={this.state.displayDate}
+                minDate={this.state.minDate}
+                maxDate={this.state.maxDate}
+                changeDate={this.changeDate}
+                submitRequest={this.submitRequest}
+                index={this.state.index + 1}
+                maxIndex={this.state.maxIndex + 1}
+                changeIndex={this.changeIndex}
+                imgSrc={this.state.imgSrc}
+            />
         );
     }
 }
 
+// Generates the webpage html using the data contained in the props
 function Display(props) {
     return (
         <div className="viewport">
             <div className="header">
-                {/* <img width="150" height="150"
-                    src="https://cdn.discordapp.com/attachments/429121521529651210/912163559310512168/397206-middle.png" alt="" /> */}
-                {/* <div className="userdata"> */}
-                    <h1>Mars Rover Images</h1>
-                {/* </div> */}
-                {/* <img width="150" height="150"
-                    src="https://cdn.discordapp.com/attachments/429121521529651210/912163559310512168/397206-middle.png" alt="" /> */}
+                <h1>Mars Rover Images</h1>
             </div>
             <div className="rovercontainer">
                 <div className="selectioncontainer">
-                    <h1 className="bordertext">Selected Rover: {props.rover}</h1>
+                    <h1 className="bordertext">Rover: {props.rover}</h1>
                     <select className="bordertext" onChange={props.changeRover}>
                         <option value="curiosity">Curiosity</option>
                         <option value="opportunity">Opportunity</option>
@@ -162,7 +170,7 @@ function Display(props) {
                 </div>
                 <div className="selectioncontainer">
                     <h1 className="bordertext">{props.date}</h1>
-                    <input className="bordertext" type="date" min={props.minDate} max={props.maxDate} onChange={props.generateQuery} />
+                    <input className="bordertext" type="date" min={props.minDate} max={props.maxDate} onChange={props.changeDate} />
                     <button className="bordertext" type="button" onClick={props.submitRequest}>Submit Request</button>
                 </div>
                 <div className="picturecontainer">
