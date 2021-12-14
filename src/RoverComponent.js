@@ -4,8 +4,20 @@ class RoverComponent extends React.Component {
     constructor(props) {
         super(props);
 
+        this.getDate = this.getDate.bind(this);
+        this.changeRover = this.changeRover.bind(this);
+        this.generateQuery = this.generateQuery.bind(this);
+        this.submitRequest = this.submitRequest.bind(this);
+        this.changeIndex = this.changeIndex.bind(this);
+        this.next = this.next.bind(this);
+        this.previous = this.previous.bind(this);
+
+        const today = new Date(new Date().getTime() - new Date().getTimezoneOffset() * 60000).toISOString().split("T")[0];
+
         this.state = {
-            api: "https://api.nasa.gov/mars-photos/api/v1/rovers/curiosity/photos",
+            api1: "https://api.nasa.gov/mars-photos/api/v1/rovers/",
+            api2: "/photos",
+            selectedRover: "curiosity",
             key: "&api_key=W0JTYr31WWFst27Jqc2mkPzSJhCIBaKtWBy3dfcS",
             apiQuery: "",
             submittedQuery: "",
@@ -15,13 +27,29 @@ class RoverComponent extends React.Component {
             date: "No date selected",
             index: 0,
             maxIndex: 0,
+            today: today,
+            minDate: "2012-08-06",
+            maxDate: today
         }
+    }
 
-        this.generateQuery = this.generateQuery.bind(this);
-        this.submitRequest = this.submitRequest.bind(this);
-        this.changeIndex = this.changeIndex.bind(this);
-        this.next = this.next.bind(this);
-        this.previous = this.previous.bind(this);
+    getDate() {
+        return new Date(new Date().getTime() - new Date().getTimezoneOffset() * 60000).toISOString().split("T")[0];
+    }
+
+    changeRover(e) {
+        let today = this.getDate();
+        let minMax = new Map([
+            ["curiosity", ["2012-08-06", today]],
+            ["opportunity", ["2004-01-26", "2018-06-09"]],
+            ["perseverance", [1, 2]],
+            ["spirit", [1, 2]]
+        ]);
+
+        this.setState({
+            selectedRover: e.target.value
+            
+        })
     }
 
     generateQuery(e) {
@@ -36,8 +64,7 @@ class RoverComponent extends React.Component {
             month = month.substring(1, 2);
         }
         let year = date.substring(0, 4);
-        let query = `${this.state.api}?earth_date=${year}-${month}-${day}${this.state.key}`;
-        console.log(query);
+        let query = `${this.state.api1}${this.state.selectedRover}${this.state.api2}?earth_date=${year}-${month}-${day}${this.state.key}`;
 
         // Update the state with the new nasa query and formatted date
         this.setState({
@@ -48,7 +75,6 @@ class RoverComponent extends React.Component {
 
     submitRequest() {
         // fetch the data from the nasa api using the generated apiQuery held in the state
-        console.log(this.state.apiQuery);
         if (this.state.apiQuery !== this.state.submittedQuery) {
             fetch(this.state.apiQuery)
                 .then(response => {
@@ -59,7 +85,7 @@ class RoverComponent extends React.Component {
                         this.setState({
                             apiData: data,
                             index: 0,
-                            maxIndex: data.photos.length-1,
+                            maxIndex: data.photos.length - 1,
                             submittedQuery: this.state.apiQuery,
                             imgSrc: data.photos[0].img_src
                         })
@@ -74,8 +100,6 @@ class RoverComponent extends React.Component {
                         })
                     }
                 })
-        } else {
-            alert("Date already submitted");
         }
     }
 
@@ -109,7 +133,7 @@ class RoverComponent extends React.Component {
 
     render() {
         return (
-                <Display date={this.state.date} generateQuery={this.generateQuery} submitRequest={this.submitRequest} index={this.state.index + 1} maxIndex={this.state.maxIndex + 1} imgSrc={this.state.imgSrc} changeIndex={this.changeIndex}/>
+            <Display date={this.state.date} rover={this.state.selectedRover} minDate={this.state.minDate} maxDate={this.state.maxDate} changeRover={this.changeRover} generateQuery={this.generateQuery} submitRequest={this.submitRequest} index={this.state.index + 1} maxIndex={this.state.maxIndex + 1} imgSrc={this.state.imgSrc} changeIndex={this.changeIndex} />
         );
     }
 }
@@ -118,23 +142,32 @@ function Display(props) {
     return (
         <div className="viewport">
             <div className="header">
-                <img width="150" height="150"
-                    src="https://cdn.discordapp.com/attachments/429121521529651210/912163559310512168/397206-middle.png" alt=""/>
-                <div className="userdata">
-                    <h1>Mars Rover Images</h1>
-                </div>
-                <img width="150" height="150"
-                    src="https://cdn.discordapp.com/attachments/429121521529651210/912163559310512168/397206-middle.png" alt=""/>
+                {/* <img width="150" height="150"
+                    src="https://cdn.discordapp.com/attachments/429121521529651210/912163559310512168/397206-middle.png" alt="" /> */}
+                {/* <div className="userdata"> */}
+                    <h1 className="text">Mars Rover Images</h1>
+                {/* </div> */}
+                {/* <img width="150" height="150"
+                    src="https://cdn.discordapp.com/attachments/429121521529651210/912163559310512168/397206-middle.png" alt="" /> */}
             </div>
             <div className="rovercontainer">
-                <div className="datacontainer">
-                    <h1>{props.date}</h1>
-                    <input type="date" onChange={props.generateQuery} />
-                    <button type="button" onClick={props.submitRequest}>Submit Request</button>
+                <div className="selectioncontainer">
+                    <h1 className="bordertext">Selected Rover: {props.rover}</h1>
+                    <select className="bordertext" onChange={props.changeRover}>
+                        <option value="curiosity">Curiosity</option>
+                        <option value="opportunity">Opportunity</option>
+                        <option value="perseverance">Perseverance</option>
+                        <option value="spirit">Spirit</option>
+                    </select>
+                </div>
+                <div className="selectioncontainer">
+                    <h1 className="bordertext">{props.date}</h1>
+                    <input className="bordertext" type="date" min={props.minDate} max={props.maxDate} onChange={props.generateQuery} />
+                    <button className="bordertext" type="button" onClick={props.submitRequest}>Submit Request</button>
                 </div>
                 <div className="picturecontainer">
-                    <h2>Selected Image: {props.index} of {props.maxIndex}</h2>
-                    <img width="450" height="450" src={props.imgSrc} alt="" onWheel={props.changeIndex}/>
+                    <h2 className="bordertext">Selected Image: {props.index} of {props.maxIndex}</h2>
+                    <img width="450" height="450" src={props.imgSrc} alt="" onWheel={props.changeIndex} />
                 </div>
             </div>
         </div>

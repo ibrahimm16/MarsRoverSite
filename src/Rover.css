@@ -6,24 +6,26 @@
 
 
 .viewport {
-  background-color: black;
+  background-image: url('https://wallpapercave.com/wp/wp9116463.jpg');
+  background-size: contain;
   width: 100vw;
   height: 100vh;
 }
 
 .header {
-  background-image: url('https://img.purch.com/rc/1920x1200/aHR0cDovL3d3dy5zcGFjZS5jb20vaW1hZ2VzL2kvMDAwLzA0My8zMjgvb3JpZ2luYWwvYXJvdW5kLWEtc3Rhci1zeXN0ZW0tMTkyMC5qcGc=');
+  background-image: url('https://www.esa.int/var/esa/storage/images/esa_multimedia/images/2020/04/mars_landscape/21916769-2-eng-GB/Mars_landscape.jpg');
+  background-size: cover;
   display: flex;
   flex-flow: row nowrap;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
   min-width: 100vw;
   min-height: 30vh;
+  font-size: 3em;
+  color: black
 }
 
 .userdata {
-  color: white;
-  padding: 10px;
   display: flex;
   flex-flow: column wrap;
   justify-content: space-evenly;
@@ -34,20 +36,21 @@
 }
 
 .rovercontainer {
+  background-color: transparent;
   display: flex;
-  flex-flow: column wrap;
-  justify-content: space-evenly;
+  flex-flow: row wrap;
+  justify-content: space-around;
   align-items: center;
-  background: linear-gradient(#000, #ff7f08);
   min-height: 70vh;
   min-width: 100vw;
 }
 
-.inputcontainer {
+.selectioncontainer {
   display: flex;
-  flex-flow: row nowrap;
-  justify-content: space-between;
+  flex-flow: column wrap;
+  justify-content: space-evenly;
   align-items: center;
+  min-height: 30vh;
   min-width: 30vw;
 }
 
@@ -56,7 +59,20 @@
   color: white;
   display: flex;
   flex-flow: column wrap;
-  justify-content: space-between;
+  justify-content: space-evenly;
   align-items: center;
-  min-width: 50vw;
+  min-width: 40vw;
+  min-height: 70vh;
+}
+
+.bordertext {
+  padding: 3px;
+  background: linear-gradient(#C98562, #3A3225);
+  color: black;
+  border-radius: 10px;
+  font-size: 1em;
+}
+
+.text {
+  color: black;
 }
