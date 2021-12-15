@@ -131,7 +131,7 @@ class RoverComponent extends React.Component {
         }
     }
 
-    // Render function returns the Display function passing necessary data to it via props
+    // Render returns multiple functions which create the webpage's html elements
     render() {
         return (
             <>
