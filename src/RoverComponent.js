@@ -134,50 +134,79 @@ class RoverComponent extends React.Component {
     // Render function returns the Display function passing necessary data to it via props
     render() {
         return (
-            <Display
-                rover={this.state.selectedRover}
-                changeRover={this.changeRover}
-                date={this.state.displayDate}
-                minDate={this.state.minDate}
-                maxDate={this.state.maxDate}
-                changeDate={this.changeDate}
-                submitRequest={this.submitRequest}
-                index={this.state.index + 1}
-                maxIndex={this.state.maxIndex + 1}
-                changeIndex={this.changeIndex}
-                imgSrc={this.state.imgSrc}
-            />
+            <>
+                <div className="viewport">
+                    <Header />
+                    <div className="rovercontainer">
+
+                        <RoverSelection
+                            rover={this.state.selectedRover}
+                            changeRover={this.changeRover}
+                        />
+
+                        <DateSelection
+                            date={this.state.displayDate}
+                            minDate={this.state.minDate}
+                            maxDate={this.state.maxDate}
+                            changeDate={this.changeDate}
+                            submitRequest={this.submitRequest}
+                        />
+
+                        <RoverImage
+                            index={this.state.index + 1}
+                            maxIndex={this.state.maxIndex + 1}
+                            changeIndex={this.changeIndex}
+                            imgSrc={this.state.imgSrc}
+                        />
+
+                    </div>
+                </div>
+            </>
         );
     }
 }
 
-// Generates the webpage html using the data contained in the props
-function Display(props) {
+// Webpage header
+function Header(props) {
     return (
-        <div className="viewport">
-            <div className="header">
-                <h1>Mars Rover Images</h1>
-            </div>
-            <div className="rovercontainer">
-                <div className="selectioncontainer">
-                    <h1 className="bordertext">Rover: {props.rover}</h1>
-                    <select className="bordertext" onChange={props.changeRover}>
-                        <option value="curiosity">Curiosity</option>
-                        <option value="opportunity">Opportunity</option>
-                        <option value="perseverance">Perseverance</option>
-                        <option value="spirit">Spirit</option>
-                    </select>
-                </div>
-                <div className="selectioncontainer">
-                    <h1 className="bordertext">{props.date}</h1>
-                    <input className="bordertext" type="date" min={props.minDate} max={props.maxDate} onChange={props.changeDate} />
-                    <button className="bordertext" type="button" onClick={props.submitRequest}>Submit Request</button>
-                </div>
-                <div className="picturecontainer">
-                    <h2 className="bordertext">Selected Image: {props.index} of {props.maxIndex}</h2>
-                    <img width="450" height="450" src={props.imgSrc} alt="" onWheel={props.changeIndex} />
-                </div>
-            </div>
+        <div className="header">
+            <h1>Mars Rover Images</h1>
+        </div>
+    );
+}
+
+// webpage rover selection functionality/display
+function RoverSelection(props) {
+    return (
+        <div className="selectioncontainer">
+            <h1 className="bordertext">Rover: {props.rover}</h1>
+            <select className="bordertext" onChange={props.changeRover}>
+                <option value="curiosity">Curiosity</option>
+                <option value="opportunity">Opportunity</option>
+                <option value="perseverance">Perseverance</option>
+                <option value="spirit">Spirit</option>
+            </select>
+        </div>
+    );
+}
+
+// Webpage date selection functionality/display
+function DateSelection(props) {
+    return (
+        <div className="selectioncontainer">
+            <h1 className="bordertext">{props.date}</h1>
+            <input className="bordertext" type="date" min={props.minDate} max={props.maxDate} onChange={props.changeDate} />
+            <button className="bordertext" type="button" onClick={props.submitRequest}>Submit Request</button>
+        </div>
+    );
+}
+
+// Webpage selected rover image display
+function RoverImage(props) {
+    return (
+        <div className="picturecontainer">
+            <h2 className="bordertext">Selected Image: {props.index} of {props.maxIndex}</h2>
+            <img width="450" height="450" src={props.imgSrc} alt="" onWheel={props.changeIndex} />
         </div>
     );
 }
